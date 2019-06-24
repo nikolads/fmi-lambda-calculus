@@ -5,3 +5,7 @@ authors = ["Nikola Stoyanov <nikolads@uni-sofia.bg>"]
 edition = "2018"
 
 [dependencies]
+ron = "0.5.1"
+serde = "1.0.93"
+serde_derive = "1.0.93"
+structopt = "0.2.16"

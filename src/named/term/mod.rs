@@ -1,8 +1,10 @@
 use crate::unnamed::Term as UnnamedTerm;
 use std::collections::HashSet;
 use std::fmt::{self, Display};
+use serde_derive::Deserialize;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Deserialize)]
 pub enum Term {
     Var(String),
     Apply(Box<Term>, Box<Term>),

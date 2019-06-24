@@ -1,7 +1,9 @@
 use crate::named::Term as NamedTerm;
 use std::fmt::{self, Display};
+use serde_derive::Deserialize;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Deserialize)]
 pub enum Term {
     Var(usize),
     Apply(Box<Term>, Box<Term>),
