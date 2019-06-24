@@ -1,7 +1,7 @@
 [package]
 name = "hw"
 version = "0.1.0"
-authors = ["Nikola Stoyanov <ns.barzakov@gmail.com>"]
+authors = ["Nikola Stoyanov <nikolads@uni-sofia.bg>"]
 edition = "2018"
 
 [dependencies]

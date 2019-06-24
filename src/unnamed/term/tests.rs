@@ -28,10 +28,7 @@ fn substitution_simple() {
     assert_eq!(lambda!(0).substitute(0, &lambda!(2)), lambda!(2));
     assert_eq!(lambda!(1).substitute(0, &lambda!(2)), lambda!(1));
     assert_eq!(lambda!(0 1 2).substitute(1, &lambda!(2)), lambda!(0 2 2));
-}
 
-#[test]
-fn substitution_lambda() {
     // (λ 0)[0 -> 1] = (λ 0)
     assert_eq!(lambda!(λ 0).substitute(0, &lambda!(1)), lambda!(λ 0));
 
@@ -61,10 +58,7 @@ fn substitution_lambda() {
         lambda!(λ 0 (λ 2)).substitute(0, &lambda!(1)),
         lambda!(λ 0 (λ 3))
     );
-}
 
-#[test]
-fn substitution_lambda_overflow() {
     // (λ 0 max)[0 -> 1] = (λ 0 max)
     let max = usize::max_value();
     assert_eq!(lambda!(λ 0 max).substitute(0, &lambda!(1)), lambda!(λ 0 max));
