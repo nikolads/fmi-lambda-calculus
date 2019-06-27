@@ -1,25 +1,26 @@
-use super::*;
+use crate::named::Term;
+use crate::term;
 
 #[test]
 fn macro_var() {
-    assert_eq!(lambda!(x), Term::var("x"));
-    assert_eq!(lambda!((y)), Term::var("y"));
-    assert_eq!(lambda!((z)), Term::var("z"));
-    assert_eq!(lambda!(VAR_1), Term::var("VAR_1"));
+    assert_eq!(term!(x), Term::var("x"));
+    assert_eq!(term!((y)), Term::var("y"));
+    assert_eq!(term!((z)), Term::var("z"));
+    assert_eq!(term!(VAR_1), Term::var("VAR_1"));
 }
 
 #[test]
 fn macro_apply() {
-    assert_eq!(lambda!(a b), Term::apply(Term::var("a"), Term::var("b")));
-    assert_eq!(lambda!((a b)), Term::apply(Term::var("a"), Term::var("b")));
+    assert_eq!(term!(a b), Term::apply(Term::var("a"), Term::var("b")));
+    assert_eq!(term!((a b)), Term::apply(Term::var("a"), Term::var("b")));
 
     assert_eq!(
-        lambda!(a b c),
+        term!(a b c),
         Term::apply(Term::apply(Term::var("a"), Term::var("b")), Term::var("c"))
     );
 
     assert_eq!(
-        lambda!(a b c d),
+        term!(a b c d),
         Term::apply(
             Term::apply(Term::apply(Term::var("a"), Term::var("b")), Term::var("c")),
             Term::var("d")
@@ -27,29 +28,29 @@ fn macro_apply() {
     );
 
     assert_eq!(
-        lambda!((a b) c),
+        term!((a b) c),
         Term::apply(Term::apply(Term::var("a"), Term::var("b")), Term::var("c"))
     );
 
     assert_eq!(
-        lambda!(a (b c)),
+        term!(a (b c)),
         Term::apply(Term::var("a"), Term::apply(Term::var("b"), Term::var("c")))
     );
 }
 
 #[test]
 fn macro_lambda() {
-    assert_eq!(lambda!(λ y y), Term::lambda("y", Term::var("y")));
-    assert_eq!(lambda!((λ y y)), Term::lambda("y", Term::var("y")));
-    assert_eq!(lambda!(λ VAR_1 x), Term::lambda("VAR_1", Term::var("x")));
+    assert_eq!(term!(λ y y), Term::lambda("y", Term::var("y")));
+    assert_eq!(term!((λ y y)), Term::lambda("y", Term::var("y")));
+    assert_eq!(term!(λ VAR_1 x), Term::lambda("VAR_1", Term::var("x")));
 
     assert_eq!(
-        lambda!(λ a λ b a),
+        term!(λ a λ b a),
         Term::lambda("a", Term::lambda("b", Term::var("a")))
     );
 
     assert_eq!(
-        lambda!(λ a (λ b λ c (c))),
+        term!(λ a (λ b λ c (c))),
         Term::lambda("a", Term::lambda("b", Term::lambda("c", Term::var("c"))))
     );
 }
@@ -57,7 +58,7 @@ fn macro_lambda() {
 #[test]
 fn macro_apply_and_lambda() {
     assert_eq!(
-        lambda!(λ x x b c),
+        term!(λ x x b c),
         Term::lambda(
             "x",
             Term::apply(Term::apply(Term::var("x"), Term::var("b")), Term::var("c"))
@@ -65,7 +66,7 @@ fn macro_apply_and_lambda() {
     );
 
     assert_eq!(
-        lambda!((λ x x) b c),
+        term!((λ x x) b c),
         Term::apply(
             Term::apply(Term::lambda("x", Term::var("x")), Term::var("b")),
             Term::var("c")
@@ -73,7 +74,7 @@ fn macro_apply_and_lambda() {
     );
 
     assert_eq!(
-        lambda!(λ x x (λ y y)),
+        term!(λ x x (λ y y)),
         Term::lambda(
             "x",
             Term::apply(Term::var("x"), Term::lambda("y", Term::var("y")))
@@ -81,7 +82,7 @@ fn macro_apply_and_lambda() {
     );
 
     assert_eq!(
-        lambda!((λ x x) (λ y y)),
+        term!((λ x x) (λ y y)),
         Term::apply(
             Term::lambda("x", Term::var("x")),
             Term::lambda("y", Term::var("y"))

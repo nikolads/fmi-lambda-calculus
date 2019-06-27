@@ -1,10 +1,9 @@
 use crate::unnamed::Term as UnnamedTerm;
+use serde_derive::Deserialize;
 use std::collections::HashSet;
 use std::fmt::{self, Display};
-use serde_derive::Deserialize;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-#[derive(Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
 pub enum Term {
     Var(String),
     Apply(Box<Term>, Box<Term>),
@@ -138,9 +137,10 @@ impl Display for Term {
                     _ => write!(f, "({})", t2),
                 }
             },
-            Lambda(x, t @ box Var(_)) => write!(f, "λ {} {}", x, t),
-            Lambda(x, t @ box Lambda(_, _)) => write!(f, "λ {} {}", x, t),
-            Lambda(x, t) => write!(f, "λ {} ({})", x, t),
+            Lambda(x, t) => match **t {
+                Var(_) | Lambda(_, _) => write!(f, "λ {} {}", x, t),
+                _ => write!(f, "λ {} ({})", x, t),
+            },
         }
     }
 }
