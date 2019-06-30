@@ -23,9 +23,9 @@ enum Command {
     ///
     /// Изход
     /// ```ignore
-    /// λ x λ z z
+    /// λ x. λ z. z
     /// ```
-    #[structopt(name = "subs-named")]
+    #[structopt(name = "subst-named")]
     SubstituteNamed,
 
     /// Субституция върху безименен ламбда терм
@@ -46,7 +46,7 @@ enum Command {
     /// ```ignore
     /// λ λ 0
     /// ```
-    #[structopt(name = "subs-unnamed")]
+    #[structopt(name = "subst-unnamed")]
     SubstituteUnnamed,
 
     /// Convert a named term to unnamed

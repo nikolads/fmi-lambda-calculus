@@ -16,56 +16,56 @@ fn conversion() {
     );
 
     assert_eq!(
-        Term::from_named(&term!(λ x x)),
+        Term::from_named(&term!(λ x. x)),
         (unnamed_term!(λ 0), vec![])
     );
     assert_eq!(
-        Term::from_named(&term!(λ x y)),
+        Term::from_named(&term!(λ x. y)),
         (unnamed_term!(λ 1), vec![String::from("y")])
     );
     assert_eq!(
-        Term::from_named(&term!(λ x x y)),
+        Term::from_named(&term!(λ x. x y)),
         (unnamed_term!(λ 0 1), vec![String::from("y")])
     );
     assert_eq!(
-        Term::from_named(&term!(λ x y x)),
+        Term::from_named(&term!(λ x. y x)),
         (unnamed_term!(λ 1 0), vec![String::from("y")])
     );
 
     assert_eq!(
-        Term::from_named(&term!(λ x λ y x)),
+        Term::from_named(&term!(λ x. λ y. x)),
         (unnamed_term!(λ λ 1), vec![])
     );
     assert_eq!(
-        Term::from_named(&term!(λ x λ y y)),
+        Term::from_named(&term!(λ x. λ y. y)),
         (unnamed_term!(λ λ 0), vec![])
     );
     assert_eq!(
-        Term::from_named(&term!(λ x λ y z)),
+        Term::from_named(&term!(λ x. λ y. z)),
         (unnamed_term!(λ λ 2), vec![String::from("z")])
     );
 
     assert_eq!(
-        Term::from_named(&term!((λ x x) (λ y y))),
+        Term::from_named(&term!((λ x. x) (λ y. y))),
         (unnamed_term!((λ 0) (λ 0)), vec![])
     );
     assert_eq!(
-        Term::from_named(&term!((λ x x) x)),
+        Term::from_named(&term!((λ x. x) x)),
         (unnamed_term!((λ 0) 0), vec![String::from("x")])
     );
     assert_eq!(
-        Term::from_named(&term!((λ x y) x)),
+        Term::from_named(&term!((λ x. y) x)),
         (
             unnamed_term!((λ 1) 1),
             vec![String::from("y"), String::from("x")]
         )
     );
     assert_eq!(
-        Term::from_named(&term!(x (λ x x))),
+        Term::from_named(&term!(x (λ x. x))),
         (unnamed_term!(0 (λ 0)), vec![String::from("x")])
     );
     assert_eq!(
-        Term::from_named(&term!((λ x λ y x) (λ x x))),
+        Term::from_named(&term!((λ x. λ y. x) (λ x. x))),
         (unnamed_term!((λ λ 1) (λ 0)), vec![])
     );
 }

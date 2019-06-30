@@ -40,17 +40,17 @@ fn macro_apply() {
 
 #[test]
 fn macro_lambda() {
-    assert_eq!(term!(λ y y), Term::lambda("y", Term::var("y")));
-    assert_eq!(term!((λ y y)), Term::lambda("y", Term::var("y")));
-    assert_eq!(term!(λ VAR_1 x), Term::lambda("VAR_1", Term::var("x")));
+    assert_eq!(term!(λ y. y), Term::lambda("y", Term::var("y")));
+    assert_eq!(term!((λ y. y)), Term::lambda("y", Term::var("y")));
+    assert_eq!(term!(λ VAR_1. x), Term::lambda("VAR_1", Term::var("x")));
 
     assert_eq!(
-        term!(λ a λ b a),
+        term!(λ a. λ b. a),
         Term::lambda("a", Term::lambda("b", Term::var("a")))
     );
 
     assert_eq!(
-        term!(λ a (λ b λ c (c))),
+        term!(λ a. (λ b. λ c. (c))),
         Term::lambda("a", Term::lambda("b", Term::lambda("c", Term::var("c"))))
     );
 }
@@ -58,7 +58,7 @@ fn macro_lambda() {
 #[test]
 fn macro_apply_and_lambda() {
     assert_eq!(
-        term!(λ x x b c),
+        term!(λ x. x b c),
         Term::lambda(
             "x",
             Term::apply(Term::apply(Term::var("x"), Term::var("b")), Term::var("c"))
@@ -66,7 +66,7 @@ fn macro_apply_and_lambda() {
     );
 
     assert_eq!(
-        term!((λ x x) b c),
+        term!((λ x. x) b c),
         Term::apply(
             Term::apply(Term::lambda("x", Term::var("x")), Term::var("b")),
             Term::var("c")
@@ -74,7 +74,7 @@ fn macro_apply_and_lambda() {
     );
 
     assert_eq!(
-        term!(λ x x (λ y y)),
+        term!(λ x. x (λ y. y)),
         Term::lambda(
             "x",
             Term::apply(Term::var("x"), Term::lambda("y", Term::var("y")))
@@ -82,7 +82,7 @@ fn macro_apply_and_lambda() {
     );
 
     assert_eq!(
-        term!((λ x x) (λ y y)),
+        term!((λ x. x) (λ y. y)),
         Term::apply(
             Term::lambda("x", Term::var("x")),
             Term::lambda("y", Term::var("y"))

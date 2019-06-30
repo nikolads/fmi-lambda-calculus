@@ -137,10 +137,7 @@ impl Display for Term {
                     _ => write!(f, "({})", t2),
                 }
             },
-            Lambda(x, t) => match **t {
-                Var(_) | Lambda(_, _) => write!(f, "λ {} {}", x, t),
-                _ => write!(f, "λ {} ({})", x, t),
-            },
+            Lambda(x, t) => write!(f, "λ {}. {}", x, t),
         }
     }
 }

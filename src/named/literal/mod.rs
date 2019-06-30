@@ -5,8 +5,8 @@ macro_rules! term {
         $crate::named::Term::var(stringify!($x))
     };
 
-    // handle 'λ x M'
-    (λ $x:ident $($M:tt)+) => {
+    // handle 'λ x. M'
+    (λ $x:ident . $($M:tt)+) => {
         $crate::named::Term::lambda(stringify!($x), $crate::term!($($M)+))
     };
 
