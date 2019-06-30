@@ -65,19 +65,12 @@ impl Term {
     pub fn substitute(&self, var: usize, subs: &Term) -> Term {
         use Term::*;
 
-        fn lower(term: &Term) -> Term {
+        fn raise(term: &Term, from: usize) -> Term {
             match term {
-                Var(x) => Var(x.wrapping_sub(1)),
-                Apply(t1, t2) => Term::apply(lower(&t1), lower(&t2)),
-                Lambda(t) => Term::lambda(lower(&t)),
-            }
-        }
-
-        fn raise(term: &Term) -> Term {
-            match term {
+                Var(x) if *x < from => Var(*x),
                 Var(x) => Var(x.wrapping_add(1)),
-                Apply(t1, t2) => Term::apply(raise(&t1), raise(&t2)),
-                Lambda(t) => Term::lambda(raise(&t)),
+                Apply(t1, t2) => Term::apply(raise(&t1, from), raise(&t2, from)),
+                Lambda(t) => Term::lambda(raise(&t, from+1)),
             }
         }
 
@@ -85,7 +78,7 @@ impl Term {
             Var(x) if *x == var => subs.clone(),
             Var(x) => Var(*x),
             Apply(t1, t2) => Term::apply(t1.substitute(var, subs), t2.substitute(var, subs)),
-            Lambda(t) => Term::lambda(raise(&lower(&t).substitute(var, subs))),
+            Lambda(t) => Term::lambda(t.substitute(var+1, &raise(subs, 0))),
         }
     }
 }

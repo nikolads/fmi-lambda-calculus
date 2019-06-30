@@ -42,7 +42,7 @@ fn conversion() {
 }
 
 #[test]
-fn substitution() {
+fn substitute_with_var() {
     assert_eq!(term!(x).substitute("x", &term!(z)), term!(z));
     assert_eq!(term!(x).substitute("y", &term!(z)), term!(x));
     assert_eq!(term!(x y z).substitute("y", &term!(z)), term!(x z z));
@@ -54,14 +54,63 @@ fn substitution() {
         term!(λ x y (λ y x y)).substitute("y", &term!(x)),
         term!(λ z x (λ y z y))
     );
+}
+
+#[test]
+fn substitute_with_application() {
+    assert_eq!(term!(x).substitute("x", &term!(y x)), term!(y x));
+    assert_eq!(term!(x y z).substitute("y", &term!(x y z)), term!(x (x y z) z));
 
     assert_eq!(
-        term!(λ x x y).substitute("y", &term!(x z)),
-        term!(λ w w (x z))
+        term!(λ x y).substitute("y", &term!(x y z)),
+        term!(λ w x y z)
+    );
+
+    assert_eq!(
+        term!(λ x x y z).substitute("y", &term!(x y z)),
+        term!(λ w w (x y z) z)
+    );
+
+    assert_eq!(
+        term!(λ x y (λ y x y)).substitute("y", &term!(x y)),
+        term!(λ z (x y) (λ y z y))
+    );
+
+    assert_eq!(
+        term!(λ x y (λ y x y)).substitute("y", &term!(x y z)),
+        term!(λ w (x y z) (λ y w y))
+    );
+}
+
+#[test]
+fn substitute_with_lambda() {
+    assert_eq!(
+        term!(x).substitute("x", &term!(λ x x)),
+        term!(λ x x)
+    );
+
+    assert_eq!(
+        term!(x y z).substitute("y", &term!(λ x x y)),
+        term!(x (λ x x y) z)
     );
 
     assert_eq!(
         term!(λ x y).substitute("y", &term!(λ x x)),
         term!(λ x (λ x x))
+    );
+
+    assert_eq!(
+        term!(λ x y (λ y x y)).substitute("y", &term!(λ x x y z)),
+        term!(λ x (λ x x y z) (λ y x y))
+    );
+
+    assert_eq!(
+        term!(λ x y (λ y x y)).substitute("y", &term!(λ y x y z)),
+        term!(λ w (λ y x y z) (λ y w y))
+    );
+
+    assert_eq!(
+        term!(λ x y (λ y x y)).substitute("y", &term!(λ z x y z)),
+        term!(λ z (λ z x y z) (λ y z y))
     );
 }

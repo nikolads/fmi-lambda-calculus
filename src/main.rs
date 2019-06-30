@@ -7,11 +7,45 @@ use structopt::StructOpt;
 
 #[derive(StructOpt)]
 enum Command {
-    /// Perform substitution on a named term
+    /// Субституция върху именуван ламбда терм
+    ///
+    /// Приема три агумента от стандартния вход, всеки на нов ред - съответно
+    /// ламбда терм, променлива и субституция за тази променлива
+    ///
+    /// # Пример
+    ///
+    /// Вход
+    /// ```ignore
+    /// Lambda("x", Var("y"))
+    /// "y"
+    /// Lambda("z", Var("z"))
+    /// ```
+    ///
+    /// Изход
+    /// ```ignore
+    /// λ x λ z z
+    /// ```
     #[structopt(name = "subs-named")]
     SubstituteNamed,
 
-    /// Perfrom substitution on an unnamed term
+    /// Субституция върху безименен ламбда терм
+    ///
+    /// Приема три агумента от стандартния вход, всеки на нов ред - съответно
+    /// ламбда терм, променлива и субституция за тази променлива
+    ///
+    /// # Пример
+    ///
+    /// Вход
+    /// ```ignore
+    /// Lambda(Var(1))
+    /// 0
+    /// Lambda(Var(0))
+    /// ```
+    ///
+    /// Изход
+    /// ```ignore
+    /// λ λ 0
+    /// ```
     #[structopt(name = "subs-unnamed")]
     SubstituteUnnamed,
 
@@ -38,7 +72,7 @@ fn main() {
             let var = {
                 let mut line = String::new();
                 stdin().read_line(&mut line).unwrap();
-                line.trim().to_string()
+                de::from_str::<String>(&line).expect("parse error")
             };
 
             let subs = {
@@ -59,7 +93,7 @@ fn main() {
             let var = {
                 let mut line = String::new();
                 stdin().read_line(&mut line).unwrap();
-                line.trim().parse::<usize>().expect("parse error")
+                de::from_str::<usize>(&line).expect("parse error")
             };
 
             let subs = {
@@ -74,19 +108,15 @@ fn main() {
             let mut line = String::new();
             stdin().read_line(&mut line).unwrap();
 
-            match de::from_str::<NamedTerm>(&line) {
-                Ok(term) => println!("{}", UnnamedTerm::from_named(&term).0),
-                Err(err) => println!("Parse error: {}", err),
-            }
+            let term = de::from_str::<NamedTerm>(&line).expect("parse error");
+            println!("{}", UnnamedTerm::from_named(&term).0);
         },
         Command::ConvertUnnamed => {
             let mut line = String::new();
             stdin().read_line(&mut line).unwrap();
 
-            match de::from_str::<UnnamedTerm>(&line) {
-                Ok(term) => println!("{}", NamedTerm::from_unnamed(&term)),
-                Err(err) => println!("Parse error: {}", err),
-            }
+            let term = de::from_str::<UnnamedTerm>(&line).expect("parse error");
+            println!("{}", NamedTerm::from_unnamed(&term));
         },
     }
 }
