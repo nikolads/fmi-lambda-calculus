@@ -1,9 +1,11 @@
 use crate::unnamed::Term as UnnamedTerm;
-use serde_derive::Deserialize;
+use serde_derive::{Serialize, Deserialize};
 use std::collections::HashSet;
 use std::fmt::{self, Display};
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
+/// Ламбда терм
+#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize)]
 pub enum Term {
     Var(String),
     Apply(Box<Term>, Box<Term>),
@@ -34,6 +36,9 @@ impl Term {
         Term::Lambda(s.into(), Box::new(t))
     }
 
+    /// Превръща безименен ламбда терм в именуван.
+    ///
+    /// Използва автоматично генериран контекст от имена.
     pub fn from_unnamed(unnamed: &UnnamedTerm) -> Self {
         let free_vars = LexicographicalNames::new(&Self::FV_LETTERS);
         let bound_vars = LexicographicalNames::new(&Self::ARG_LETTERS);
@@ -66,6 +71,7 @@ impl Term {
         }
     }
 
+    /// Изпълнява субституцията `term[var -> subs]`
     pub fn substitute(&self, var: &str, subs: &Term) -> Term {
         let fv_subs = subs.free_vars();
 
@@ -76,7 +82,6 @@ impl Term {
             Term::Lambda(x, t) if x == var => Term::Lambda(x.clone(), t.clone()),
             Term::Lambda(x, t) if fv_subs.get(x).is_some() => {
                 let fv_term = t.free_vars();
-                // fv_term.remove(var);
 
                 let name_generator = LexicographicalNames::new(&Self::ARG_LETTERS);
                 let name = (1..)
@@ -85,13 +90,14 @@ impl Term {
                     .next()
                     .unwrap();
 
-                let term = t.substitute(x, &Term::var(&name)).substitute(var, subs);
+                let term = t.substitute(x, &Term::var(name.clone())).substitute(var, subs);
                 Term::lambda(name, term)
             },
-            Term::Lambda(x, t) => Term::lambda(x, t.substitute(var, subs)),
+            Term::Lambda(x, t) => Term::lambda(x.clone(), t.substitute(var, subs)),
         }
     }
 
+    /// Връща свободните променливи на терма
     fn free_vars(&self) -> HashSet<String> {
         let mut fv = HashSet::new();
         self.fill_free_vars(&mut vec![], &mut fv);
@@ -118,6 +124,9 @@ impl Term {
     }
 }
 
+/// Формат за принтиране.
+///
+/// Използва се от `println!("{}", ...)`
 impl Display for Term {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use Term::*;
@@ -142,6 +151,21 @@ impl Display for Term {
     }
 }
 
+/// Генерира имена на променливи.
+///
+/// Имената се генерират от списък със символи - `base` и са подредени първо по
+/// дължина, после лексикографски.
+///
+/// # Пример
+///
+/// ```ignore
+/// let gen = LexicographicalNames::new(&['a', 'b', 'c']);
+///
+/// assert_eq!(
+///     (0..15).map(|i| gen.get(i)).collect::<Vec<_>>(),
+///     vec!["", "a", "b", "c", "aa", "ab", "ac", "ba", "bb", "bc", "ca", "cb", "cc", "aaa", "aab"]
+/// );
+/// ```
 struct LexicographicalNames<'a> {
     base: &'a [char],
 }

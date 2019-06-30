@@ -2,18 +2,6 @@ use super::*;
 use crate::{term, unnamed_term};
 
 #[test]
-fn lexicographical_names() {
-    let gen = LexicographicalNames::new(&['a', 'b', 'c']);
-
-    (0..15)
-        .map(|i| gen.get(i))
-        .zip(&[
-            "", "a", "b", "c", "aa", "ab", "ac", "ba", "bb", "bc", "ca", "cb", "cc", "aaa", "aab",
-        ])
-        .for_each(|(gen, &expected)| assert_eq!(gen, expected));
-}
-
-#[test]
 fn conversion() {
     assert_eq!(Term::from_unnamed(&unnamed_term!(0)), term!(a));
     assert_eq!(Term::from_unnamed(&unnamed_term!(0 1)), term!(a b));

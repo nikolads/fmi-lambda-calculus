@@ -1,9 +1,9 @@
 use crate::named::Term as NamedTerm;
+use serde_derive::{Deserialize, Serialize};
 use std::fmt::{self, Display};
-use serde_derive::Deserialize;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-#[derive(Deserialize)]
+/// Безименен ламбда терм
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Term {
     Var(usize),
     Apply(Box<Term>, Box<Term>),
@@ -23,7 +23,10 @@ impl Term {
         Term::Lambda(Box::new(t))
     }
 
-    /// Create an unnamed term from a named term
+    /// Създава безименен терм от именуван.
+    ///
+    /// Връща новия терм и контекст от имена [x_0, x_1, ..., x_n], който показва
+    /// с кой индекс са заместени свободните променливи в оригиналния терм.
     pub fn from_named(named: &NamedTerm) -> (Self, Vec<String>) {
         let mut names = Vec::new();
         let mut args = Vec::new();
@@ -61,7 +64,7 @@ impl Term {
         }
     }
 
-    /// Perform the substitution `term[var -> subs]`
+    /// Изпълнява субституцията `term[var -> subs]`
     pub fn substitute(&self, var: usize, subs: &Term) -> Term {
         use Term::*;
 
@@ -70,7 +73,7 @@ impl Term {
                 Var(x) if *x < from => Var(*x),
                 Var(x) => Var(x.wrapping_add(1)),
                 Apply(t1, t2) => Term::apply(raise(&t1, from), raise(&t2, from)),
-                Lambda(t) => Term::lambda(raise(&t, from+1)),
+                Lambda(t) => Term::lambda(raise(&t, from + 1)),
             }
         }
 
@@ -78,11 +81,14 @@ impl Term {
             Var(x) if *x == var => subs.clone(),
             Var(x) => Var(*x),
             Apply(t1, t2) => Term::apply(t1.substitute(var, subs), t2.substitute(var, subs)),
-            Lambda(t) => Term::lambda(t.substitute(var+1, &raise(subs, 0))),
+            Lambda(t) => Term::lambda(t.substitute(var + 1, &raise(subs, 0))),
         }
     }
 }
 
+/// Формат за принтиране.
+///
+/// Използва се от `println!("{}", ...)`
 impl Display for Term {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use Term::*;
@@ -102,10 +108,7 @@ impl Display for Term {
                     _ => write!(f, "({})", t2),
                 }
             },
-            Lambda(t) => match **t {
-                Var(_) | Lambda(_) => write!(f, "λ {}", t),
-                _ => write!(f, "λ ({})", t),
-            },
+            Lambda(t) => write!(f, "λ {}", t),
         }
     }
 }

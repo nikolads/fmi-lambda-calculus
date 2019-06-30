@@ -1,3 +1,20 @@
+/// Макрос за създаване на термове литерали.
+///
+/// Позволява създаване на ламбда термове със синтаксис подобен на
+/// математическата нотация. По време на компилация макроса се заемства
+/// със съответния Rust код.
+///
+/// # Пример
+///
+/// ```
+/// use hw::unnamed::Term;
+/// use hw::unnamed_term;
+///
+/// assert_eq!(
+///     unnamed_term!(λ 0 1),
+///     Term::lambda(Term::apply(Term::var(0), Term::var(1)))
+/// );
+/// ```
 #[macro_export]
 macro_rules! unnamed_term {
     // handle '(M)'
@@ -12,7 +29,7 @@ macro_rules! unnamed_term {
 
     // handle 'λ M'
     (λ $($M:tt)+) => {
-        $crate::unnamed::Term::lambda(unnamed_term!($($M)+))
+        $crate::unnamed::Term::lambda($crate::unnamed_term!($($M)+))
     };
 
     // handle 'M N ...'
